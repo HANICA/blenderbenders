@@ -23,10 +23,23 @@ class person(object):
         cube.modifiers["subsurf modifier"].levels = 2
         bpy.ops.object.shade_smooth()
 
+        self.set_scale()
+        self.set_location()
+
+        # determine state when created
+        ran_num = random.randint(1,10)
+        bpy.ops.object.material_slot_add()
+        if ran_num == 5:
+            self.add_material("infected")
+        else:
+            self.add_material("healthy")
+
+    def set_location(self):
+        location(self.name, [self.x, self.y, self.z])
+
+    def set_scale(self):
         for i in range(3):
             bpy.data.objects[self.name].scale[i] = self.scale
-
-        location(self.name, [self.x, self.y, self.z])
 
     def animate_step(self, steps):
         direction = ["left", "right", "up", "down"]
@@ -34,7 +47,7 @@ class person(object):
         for i in range(steps):
             index = random.randint(0, 3) # random from 0 to 3
             self.step_direction(direction[index]) # move one step
-            location(self.name, [self.x, self.y, self.z]) # change location of object
+            self.set_location()
             self.frame_index += self.animation_speed # set next frame location/time
             self.add_keyframe() # add keyframe
 
@@ -56,7 +69,14 @@ class person(object):
         obj.keyframe_insert(data_path = "location", frame = self.frame_index)
 
     def add_material(self, material):
-        add_material_to_object(self.name, material)
+        D = bpy.data
+
+        if len(D.objects[self.name].material_slots) < 1:
+            # if there is no slot then we append to create the slot and assign
+            D.objects[self.name].data.materials.append(D.materials[material])
+        else:
+            # we always want the material in slot[0]
+            D.objects[self.name].material_slots[0].material = D.materials[material]
 
 
 
