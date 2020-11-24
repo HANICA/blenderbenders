@@ -3,10 +3,12 @@ import sys
 from easybpy import *
 import random
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/24_11")
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/25_11")
 from main import *
 import material
 from math import *
+
+current_locations = defaultdict(list)
 
 class Person(object):
     def __init__(self, name):
@@ -63,6 +65,20 @@ class Person(object):
 
     def set_location(self):
         location(self.name, [self.x, self.y, self.z])
+
+    # def new_locations_persons(self, persons):
+    #    i = 0
+    #     while i < len(persons):
+    #         x = random.randint(0, 10) * 2
+    #         y = random.randint(0, 10) * 2
+    #        loc = tuple((x, y))
+    #        if locations[loc]:
+    #            continue
+    #
+    #        locations[loc].append(i)
+    #        persons[i].x = loc[0]
+    #        persons[i].y = loc[1]
+    #        i += 1
 
     def set_scale(self):
         for i in range(3):
@@ -134,7 +150,7 @@ class Person(object):
 
     def infect_other(self, pers):
         percentage = random.randint(1, 100)
-        if percentage <= 100:
+        if percentage <= 20:
             pers.state = "infected"
             pers.change_material(0, 255, 0)
 
