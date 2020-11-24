@@ -1,6 +1,10 @@
 import bpy
 from easybpy import *
 import random
+import sys
+
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blenderbenders")
+from material import *
 
 
 class person(object):
@@ -15,6 +19,7 @@ class person(object):
         self.stepsize = 2
         self.animation_speed = 10
         self.distance = 1
+        self.state = ""
 
     def create(self):
         cube = create_cube()
@@ -30,10 +35,12 @@ class person(object):
 
         # determine state when created
         ran_num = random.randint(1, 10)
-        if ran_num == 1:
-            self.add_material("infected")
+        if ran_num <= 5:
+            self.add_material(self.name)
+            self.state = "infected"
         else:
-            self.add_material("healthy")
+            self.add_material(self.name)
+            self.state = "healthy"
 
     def set_location(self):
         location(self.name, [self.x, self.y, self.z])
@@ -73,3 +80,8 @@ class person(object):
         D = bpy.data
         D.objects[self.name].data.materials.append(D.materials[material])
 
+    def change_color(self, r, g, b):
+        active_mat = bpy.data.materials[self.name].diffuse_color
+        active_mat[0] = r / 255
+        active_mat[1] = g / 255
+        active_mat[2] = b / 255
