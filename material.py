@@ -2,8 +2,7 @@ import random
 from easybpy import *
 import bpy
 
-
-class material(object):
+class Material(object):
     def __init__(self, name):
         self.name = name
 
@@ -14,3 +13,6 @@ class material(object):
         bpy.data.materials[self.name].diffuse_color[0] = r / 255
         bpy.data.materials[self.name].diffuse_color[1] = g / 255
         bpy.data.materials[self.name].diffuse_color[2] = b / 255
+
+
+

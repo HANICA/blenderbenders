@@ -2,74 +2,53 @@ import bpy
 import sys
 from easybpy import *
 import random
+import numpy as np
+from collections import defaultdict
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blenderbenders")
-from personv1 import *
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/24_11")
+from person import *
 from material import *
 
+persons = []
+locations = defaultdict(list)
 
 def main():
     create_collection("persons")
     set_active_collection("persons")
+
     create_persons(20)
     animate_persons(20)
 
-
-def create_instance(class_name, instance_name):
-    count = 0
-    while True:
-        x = random.randint(0, 10)
-        y = random.randint(0, 10)
-        z = 0
-        scale = 0.5
-        name = instance_name + str(count)
-        globals()[name] = class_name(x, y, z, scale, name)
-        count += 1
-        yield True
-
-
 def create_persons(amount):
-    generator_instance = create_instance(person, 'person_')
-
-    # create amount of instances of class person
     for i in range(amount):
-        next(generator_instance)
+        name = "person_" + str(i)
+        person = Person(name)
+        persons.append(person)
+    determine_locations_persons()
+    draw_persons()
 
-    # create amount of persons in blender
-    for i in range(amount):
-        name = 'person_' + str(i)
-        create_material(globals()[name].name)
-        globals()[name].create()
+def determine_locations_persons():
+    i = 0
+    while i < len(persons):
+        x = random.randint(0, 10) * 2
+        y = random.randint(0, 10) * 2
+        loc = tuple((x, y))
+        if locations[loc]:
+            continue
 
+        locations[loc].append(i)
+        persons[i].x = loc[0]
+        persons[i].y = loc[1]
+        i += 1
+
+def draw_persons():
+    for pers in persons:
+        pers.create()
 
 def animate_persons(steps):
-    select_all_objects("persons")
-    for i in range(steps):
-        for i in range(len(selected_objects())):
-            name = 'person_' + str(i)
-            if globals()[name].state == "infected":
-                check_radius(globals()[name])
-            globals()[name].animate_step()
-
-
-def check_radius(infected_person):
-    select_all_objects("persons")
-    for i in range(len(selected_objects())):
-        name = 'person_' + str(i)
-        if globals()[name].state != "infected":
-            if (infected_person.x + infected_person.distance) > globals()[name].x and (infected_person.x - infected_person.distance) < globals()[name].x:
-                if (infected_person.y + infected_person.distance) > globals()[name].y and (infected_person.y - infected_person.distance) < globals()[name].y:
-                    infect_other(name)
-
-
-def infect_other(name):
-    pass
-
-
-def create_material(mat_name):
-    person_mat = material(mat_name)
-    person_mat.create()
-    person_mat.change_color(255, 255, 255)
+    for x in range(steps):
+        for person in persons:
+            person.animate_step(persons)
 
 
 if __name__ == '__main__':
