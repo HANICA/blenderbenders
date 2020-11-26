@@ -3,7 +3,7 @@ import sys
 from easybpy import *
 import random
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/25_11")
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/26_11")
 from main import *
 import material
 from math import *
@@ -17,6 +17,9 @@ class Person(object):
         self.z = 0
         self.name = name
         self.state = ""
+        self.swap = False
+        self.current_location = []
+        self.next_location = []
         self.scale = .5
         self.frame_index = 1
         self.last_keyframe = 250
@@ -66,29 +69,11 @@ class Person(object):
     def set_location(self):
         location(self.name, [self.x, self.y, self.z])
 
-    # def new_locations_persons(self, persons):
-    #    i = 0
-    #     while i < len(persons):
-    #         x = random.randint(0, 10) * 2
-    #         y = random.randint(0, 10) * 2
-    #        loc = tuple((x, y))
-    #        if locations[loc]:
-    #            continue
-    #
-    #        locations[loc].append(i)
-    #        persons[i].x = loc[0]
-    #        persons[i].y = loc[1]
-    #        i += 1
-
     def set_scale(self):
         for i in range(3):
             bpy.data.objects[self.name].scale[i] = self.scale
 
     def animate_step(self, persons):
-        direction = ["left", "right", "up", "down"]
-
-        index = random.randint(0, 3)  # random from 0 to 3
-        self.step_direction(direction[index])  # move one step
         self.set_location()
         self.frame_index += self.animation_speed  # set next frame location/time
         if self.state == "infected":
@@ -98,17 +83,28 @@ class Person(object):
 
         bpy.context.scene.frame_end = self.frame_index  # last frame == end frame
 
-    def step_direction(self, direction):
-        if direction == "left":
-            self.x -= self.stepsize
-        elif direction == "right":
-            self.x += self.stepsize
-        elif direction == "down":
-            self.y -= self.stepsize
-        elif direction == "up":
-            self.y += self.stepsize
-
     def add_loc_keyframe(self):
+        if self.swap == True:
+            if self.current_location[0] != self.next_location[0]:
+                if self.current_location[0] > self.next_location[0]:
+                    swap_x = self.current_location[0] - (self.stepsize / 2)
+                    swap_y = self.y + 0.5
+                else:
+                    swap_x = self.current_location[0] + (self.stepsize / 2)
+                    swap_y = self.y - 0.5
+            else:
+                if self.current_location[1] > self.next_location[1]:
+                    swap_y = self.current_location[1] - (self.stepsize / 2)
+                    swap_x = self.x + 0.5
+                else:
+                    swap_y = self.current_location[1] + (self.stepsize / 2)
+                    swap_x = self.x - 0.5
+            select_object(self.name)
+            obj = bpy.context.active_object
+            obj.location = (swap_x, swap_y, self.z)
+            obj.keyframe_insert(data_path="location", frame=(self.frame_index - (self.animation_speed / 2) ) )
+            self.swap = False
+
         select_object(self.name)
         obj = bpy.context.active_object
         obj.location = (self.x, self.y, self.z)
