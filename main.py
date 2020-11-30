@@ -4,7 +4,7 @@ from easybpy import *
 import random
 from collections import defaultdict
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/27_11")
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/30_11")
 from person import *
 from material import *
 from buildings import *
@@ -14,17 +14,22 @@ walls = []
 current_locations = defaultdict(list)
 next_locations = defaultdict(list)
 wall_locations = defaultdict(list)
-grid_x = 100
-grid_y = 80
+grid_x = 50
+grid_y = 50
 
 
 def main():
+    create_collection("walls")
+    set_active_collection("walls")
+    create_borders()
+
+    create_material("person")
+
     create_collection("persons")
     set_active_collection("persons")
+    create_persons(80)
 
-    create_borders()
-    create_persons(50)
-    animate_persons(20)
+    animate_persons(40)
 
 
 def create_persons(amount):
@@ -35,6 +40,9 @@ def create_persons(amount):
     determine_start_locations_persons()
     draw_persons()
 
+def create_material(material_name):
+    new_mat = Material(material_name)
+    new_mat.create()
 
 def draw_persons():
     for pers in persons:
@@ -69,12 +77,12 @@ def wall_placement():
     i = 0
     for wall in walls:
         if wall.rotation == "horizontal":
-            for x_cor in range(grid_x):
+            for x_cor in range(grid_x + 1):
                 loc = tuple((x_cor, wall.y))
                 wall_locations[loc].append(i)  # index
                 i += 1
         else:
-            for y_cor in range(grid_y):
+            for y_cor in range(grid_y + 1):
                 loc = tuple((wall.x, y_cor))
                 wall_locations[loc].append(i)  # index
                 i += 1
