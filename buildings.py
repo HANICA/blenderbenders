@@ -1,4 +1,3 @@
-import random
 from easybpy import *
 import bpy
 import math
@@ -59,6 +58,19 @@ class Wall(object):
         else:
             bpy.data.objects[self.name].rotation_euler[2] = math.radians(0)
             self.rotation = "vertical"
+
+    def get_coordinates(self, wall_locations, grid_x, grid_y):
+        i = len(wall_locations)
+        if self.rotation == "horizontal":
+            for x_cor in range(grid_x + 1):
+                loc = tuple((x_cor, self.y))
+                wall_locations[loc].append(i)  # index
+                i += 1
+        else:
+            for y_cor in range(grid_y + 1):
+                loc = tuple((self.x, y_cor))
+                wall_locations[loc].append(i)  # index
+                i += 1
 
 
 
