@@ -3,7 +3,7 @@ from easybpy import *
 import bpy
 import sys
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/01_12")
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/03_12")
 from material import *
 from keyframe import *
 
@@ -22,7 +22,7 @@ class Healthbar(object):
 
         location(self.name, [x, y, z + scale + 1])
 
-        keyframe.add_loc_healthbar(self, x, y, z + scale + 1)
+        keyframe.add_loc_healthbar(self, x, y, z + scale + 1, keyframe.frame_index)
 
     def determine_size(self, person_health, keyframe):
         self.size = 0.8 * (person_health / 100)

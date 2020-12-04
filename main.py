@@ -4,7 +4,7 @@ from easybpy import *
 import random
 from collections import defaultdict
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/01_12")
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/03_12")
 from person import *
 from material import *
 from buildings import *
@@ -34,7 +34,7 @@ def main():
     set_active_collection("persons")
     create_persons(80, keyframe)
 
-    animate_persons(40, keyframe)
+    animate_persons(20, keyframe)
 
 def create_persons(amount, keyframe):
     for i in range(amount):
@@ -81,8 +81,6 @@ def next_locations_persons():
     for person in persons:
         loc = person.get_next_direction(next_locations, wall_locations)
         next_locations[loc].append(i)
-        person.x = loc[0]
-        person.y = loc[1]
         person.next_location = loc
         # print("old: " + str(pers.current_location) + " new: " + str(pers.next_location))
         i += 1

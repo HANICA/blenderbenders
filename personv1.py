@@ -3,7 +3,7 @@ import sys
 from easybpy import *
 import random
 
-sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/01_12")
+sys.path.append("C:/Users/david/OneDrive/Documenten/S4D/blender/Save_files/03_12")
 from main import *
 import material
 from keyframe import *
@@ -25,6 +25,9 @@ class Person(object):
         self.current_location = []
         self.next_location = []
         self.previous_direction = ""
+        self.backwards_direction = ""
+        self.left_direction = ""
+        self.right_direction = ""
         self.scale = .5
         self.stepsize = 2
         self.health_score = 100
@@ -43,8 +46,9 @@ class Person(object):
         self.material.add_to_object(self.name)
         self.shade_smooth()
         self.set_scale()
+        self.set_start_direction()
         self.set_location()
-        keyframe.add_loc_person(self, self.healthbar, self.x, self.y, self.z) # starting frame location person
+        keyframe.add_loc_person(self, self.healthbar, self.x, self.y, self.z, keyframe.frame_index) # starting frame location person
 
         percentage = random.randint(1, 100)
         if percentage <= 10:
@@ -82,45 +86,114 @@ class Person(object):
             self.x = loc[0]
             self.y = loc[1]
 
+    def get_direction_array(self):
+        ran_num = get_random(0, 100)
+        stand_still = tuple((self.x, self.y))
+        direction_array = []
+        if ran_num <= 65:
+            direction_array.append(self.forward_direction)
+            direction_array.append(self.left_direction)
+            direction_array.append(self.right_direction)
+            direction_array.append(self.backwards_direction)
+            direction_array.append(stand_still)
+        elif ran_num <= 80:
+            direction_array.append(self.left_direction)
+            direction_array.append(self.forward_direction)
+            direction_array.append(self.right_direction)
+            direction_array.append(self.backwards_direction)
+            direction_array.append(stand_still)
+        elif ran_num <= 95:
+            direction_array.append(self.right_direction)
+            direction_array.append(self.forward_direction)
+            direction_array.append(self.left_direction)
+            direction_array.append(self.backwards_direction)
+            direction_array.append(stand_still)
+        else:
+            direction_array.append(self.backwards_direction)
+            direction_array.append(self.forward_direction)
+            direction_array.append(self.right_direction)
+            direction_array.append(self.left_direction)
+            direction_array.append(stand_still)
+
+        return direction_array
+
+    def set_start_direction(self):
+        left = tuple((self.x - self.stepsize, self.y))
+        right = tuple((self.x + self.stepsize, self.y))
+        up = tuple((self.x, self.y + self.stepsize))
+        down = tuple((self.x, self.y - self.stepsize))
+        ran_num = get_random(0, 3)
+
+        if ran_num == 0:
+            self.forward_direction = left
+            self.backwards_direction = right
+            self.left_direction = down
+            self.right_direction = up
+        elif ran_num == 1:
+            self.forward_direction = left
+            self.backwards_direction = right
+            self.left_direction = down
+            self.right_direction = up
+        elif ran_num == 2:
+            self.forward_direction = left
+            self.backwards_direction = right
+            self.left_direction = down
+            self.right_direction = up
+        elif ran_num == 3:
+            self.forward_direction = left
+            self.backwards_direction = right
+            self.left_direction = down
+            self.right_direction = up
+
+
     def get_next_direction(self, next_locations, wall_locations):
         left = tuple((self.x - self.stepsize, self.y))
         right = tuple((self.x + self.stepsize, self.y))
         up = tuple((self.x, self.y + self.stepsize))
         down = tuple((self.x, self.y - self.stepsize))
-        dir_array = []
-        pos_loc = []
 
-        for i in range(len(dir_array)):
+        dir_array = self.get_direction_array()
+        direction = ""
+
+        i = 0
+        while i <= 3:
             if next_locations[dir_array[i]] or wall_locations[dir_array[i]]:
                 pass
             else:
-                pos_loc.append(dir_array[i])
+                direction = dir_array[i]
+                i = 3
+            i += 1
 
-        if len(pos_loc) != 0:
+        self.x = direction[0]
+        self.y = direction[1]
 
-            if pos_loc[ran_num] == left:
-                self.previous_direction = left
-            elif pos_loc[ran_num] == right:
-                self.previous_direction = right
-            elif pos_loc[ran_num] == up:
-                self.previous_direction = up
-            elif pos_loc[ran_num] == down:
-                self.previous_direction = down
+        new_left = tuple((self.x - self.stepsize, self.y))
+        new_right = tuple((self.x + self.stepsize, self.y))
+        new_up = tuple((self.x, self.y + self.stepsize))
+        new_down = tuple((self.x, self.y - self.stepsize))
 
-            return direction
+        if direction == left:
+            self.forward_direction = new_left
+            self.backwards_direction = new_right
+            self.left_direction = new_down
+            self.right_direction = new_up
+        elif direction == right:
+            self.forward_direction = new_right
+            self.backwards_direction = new_left
+            self.left_direction = new_up
+            self.right_direction = new_down
+        elif direction == up:
+            self.forward_direction = new_up
+            self.backwards_direction = new_down
+            self.left_direction = new_left
+            self.right_direction = new_right
+        elif direction == down:
+            self.forward_direction = new_down
+            self.backwards_direction = new_up
+            self.left_direction = new_right
+            self.right_direction = new_left
 
-    # def determine_array_order(self, left, right, up, down):
-    #     if self.previous_direction == left:
-    #         dir_array = [left, up, down, right]
-    #     elif self.previous_direction == right:
-    #         dir_array_order = [right, up, down, left]
-    #     elif self.previous_direction == up:
-    #         dir_array_order = [up, left, right, down]
-    #     elif self.previous_direction == down:
-    #         dir_array_order = [down, left, right, up]
-    #
-    #     return dir_array_order
-
+        return direction
 
     def check_infection_radius(self, persons):
         social_distance = 1.5 + self.scale
